@@ -1,2 +1,3 @@
 # AddBuildPhase
-Quick Swift tool written to add a build phase to an Xcode .pbxproj
+
+A simple command-line tool, written in Swift, to add a run script build phase to a specific target in an Xcode project.
