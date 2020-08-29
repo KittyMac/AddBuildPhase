@@ -18,10 +18,8 @@ public struct AddBuildPhaseFramework {
         // "objects" - root level thing which contains lookup values of all objects
         // "target" - the target object for the named target we were given
         // "buildPhases" - the build phases object for the "target" object
-        let targetKey = "\(target)::\(target)"
-        
         guard let objects = project.value(forKey: "objects") as? NSObject else { return false }
-        guard let target = objects.value(forKey: targetKey) as? NSObject else { return false }
+        guard let target = objects.value(forKey: target) as? NSObject else { return false }
         guard let buildPhases = target.value(forKey: "buildPhases") as? NSMutableArray else { return false }
         
         // insert new run script build phase in objects
