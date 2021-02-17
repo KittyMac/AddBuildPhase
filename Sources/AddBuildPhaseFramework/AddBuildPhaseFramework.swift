@@ -18,9 +18,21 @@ public struct AddBuildPhaseFramework {
         // "objects" - root level thing which contains lookup values of all objects
         // "target" - the target object for the named target we were given
         // "buildPhases" - the build phases object for the "target" object
-        guard let objects = project.value(forKey: "objects") as? NSObject else { return false }
+        guard let objects = project.value(forKey: "objects") as? NSDictionary else { return false }
         guard let target = objects.value(forKey: target) as? NSObject else { return false }
         guard let buildPhases = target.value(forKey: "buildPhases") as? NSMutableArray else { return false }
+        
+        // set CURRRENT_PROJECT_VERSION of all build configurations to 1
+        for key in objects.allKeys {
+            guard let object = objects[key] as? NSObject else { continue }
+            guard let isa = object.value(forKey: "isa") as? NSString else { continue }
+            guard isa == "XCBuildConfiguration" else { continue }
+            guard let buildSettings = object.value(forKey: "buildSettings") as? NSObject else { continue }
+            guard buildSettings.value(forKey: "INFOPLIST_FILE") != nil else { continue }
+            
+            buildSettings.setValue("1", forKey: "CURRENT_PROJECT_VERSION")
+        }
+        
         
         // insert new run script build phase in objects
         let emptyArray = NSMutableArray()
