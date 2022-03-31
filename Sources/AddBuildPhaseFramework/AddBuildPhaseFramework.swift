@@ -8,7 +8,7 @@ public struct AddBuildPhaseFramework {
     }
     
     @discardableResult
-    public func process(_ path: String, _ target: String, _ script: String) -> Bool {
+    public func process(_ path: String, _ targetString: String, _ script: String) -> Bool {
         let projectUrl = URL(fileURLWithPath: path)
         guard let projectData = try? Data(contentsOf: projectUrl) else { return false }
         guard let project = try? PropertyListSerialization.propertyList(from:projectData, options: .mutableContainersAndLeaves, format: nil) as? NSObject else { return false }
@@ -19,7 +19,19 @@ public struct AddBuildPhaseFramework {
         // "target" - the target object for the named target we were given
         // "buildPhases" - the build phases object for the "target" object
         guard let objects = project.value(forKey: "objects") as? NSDictionary else { return false }
-        guard let target = objects.value(forKey: target) as? NSObject else { return false }
+        
+        // Need to perform a case-insensitive search as different xcode versions perform
+        // different transformations on name casing (ie target MyProject::Pamphlet vs myproject::Pamphlet)
+        var actualTargetString = ""
+        for key in objects.allKeys {
+            if let keyString = key as? String,
+               keyString.lowercased() == targetString.lowercased() {
+                actualTargetString = keyString
+                break
+            }
+        }
+        guard actualTargetString.count > 0 else { return false }
+        guard let target = objects.value(forKey: actualTargetString) as? NSObject else { return false }
         guard let buildPhases = target.value(forKey: "buildPhases") as? NSMutableArray else { return false }
         
         // set CURRRENT_PROJECT_VERSION of all build configurations to 1
