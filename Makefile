@@ -5,7 +5,9 @@ SWIFT_BUILD_FLAGS=--configuration release
 all: build
 
 build:
-	swift build $(SWIFT_BUILD_FLAGS)
+	swift build $(SWIFT_BUILD_FLAGS) --triple arm64-apple-macosx
+	swift build $(SWIFT_BUILD_FLAGS) --triple x86_64-apple-macosx
+	lipo -create -output .build/release/AddBuildPhase .build/arm64-apple-macosx/release/AddBuildPhase .build/x86_64-apple-macosx/release/AddBuildPhase
 
 clean:
 	rm -rf .build
